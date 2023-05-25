@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+  FUNCIONARIO
+}
+
+model Usuario {
+  id          String        @id @default(uuid())
+  name        String
+  email       String        @unique
+  password    String
+  avatar      String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  Agendamento Agendamento[]
+  roles       Role[]        @default([USER])
+
+  @@map("usuarios")
+}
+
+model Procedimento {
+  id          String        @id @default(uuid())
+  name        String
+  description String
+  price       String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  agendamento Agendamento[]
+  role        Role          @default(FUNCIONARIO)
+
+  @@map("procedimentos")
+}
+
+model Agendamento {
+  id             String       @id @default(uuid())
+  cliente        Usuario      @relation(fields: [usuarioId], references: [id])
+  usuarioId      String
+  procedimento   Procedimento @relation(fields: [procedimentoId], references: [id])
+  procedimentoId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("agendamentos")
+}
